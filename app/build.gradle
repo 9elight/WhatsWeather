@@ -51,7 +51,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     //Google
-    implementation 'com.google.android.gms:play-services-location:11.0.2'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
 
 
     //Okhttp
@@ -80,9 +80,7 @@ dependencies {
     kapt "com.github.moxy-community:moxy-compiler:$moxyVersion"
     implementation "com.github.moxy-community:moxy-app-compat:$moxyVersion"
 
-    //Graphics
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
-
+    
     //koin
     def koinVersion = '2.0.1'
     implementation "org.koin:koin-android:$koinVersion"

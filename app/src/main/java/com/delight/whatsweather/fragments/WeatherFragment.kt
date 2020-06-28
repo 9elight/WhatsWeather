@@ -1,5 +1,6 @@
 package com.delight.whatsweather.fragments
 
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,12 +14,12 @@ import com.delight.whatsweather.data.WeatherRepositories
 import com.delight.whatsweather.model.onecall.WeatherOneCall
 import com.delight.whatsweather.presenter.WeatherPresenter
 import com.delight.whatsweather.utils.DateParser
+import com.delight.whatsweather.utils.LocationUtils
 import com.delight.whatsweather.utils.WeatherIconHelper
 import com.delight.whatsweather.views.WeatherView
 import kotlinx.android.synthetic.main.fragment_main_weather.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import moxy.MvpAppCompatFragment
 import moxy.presenter.InjectPresenter
@@ -28,7 +29,6 @@ import kotlin.coroutines.CoroutineContext
 
 
 class WeatherFragment : MvpAppCompatFragment(), WeatherView,CoroutineScope {
-
     private val weatherRepositories: WeatherRepositories by inject()
     @InjectPresenter
     lateinit var weatherPresenter: WeatherPresenter
@@ -37,27 +37,42 @@ class WeatherFragment : MvpAppCompatFragment(), WeatherView,CoroutineScope {
         return WeatherPresenter(weatherRepositories = weatherRepositories)
     }
     companion object{
-        fun instance(): WeatherFragment{
-            return WeatherFragment()
+        fun instance(location: Location?): WeatherFragment = WeatherFragment().apply{
+            this.arguments = Bundle().apply {
+                putString("lat",location?.latitude.toString())
+                putString("lat",location?.longitude.toString())
+            }
         }
     }
     private lateinit var mView: View
-
+    private var location: Location? = null
+    private lateinit var locationUtils: LocationUtils
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val lat:Location? = this.arguments?.getParcelable("lat")
+        launch {
+            weatherPresenter.loadWeather("Bishkek","metric")
+
+        }
         mView = inflater.inflate(R.layout.fragment_main_weather, container, false)
         return mView
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        launch {
-            weatherPresenter.loadWeather("Bishkek","metric")
-        }
+        Log.e("tag","")
+
     }
 
+//    fun loadWeather(location: Location){
+//        Log.e("tag","")
+//        launch {
+//            weatherPresenter.loadWeather("Bishkek","metric")
+//        }
+//        this.location = location
+//    }
     override fun startWeatherLoading() {
         txt_date.visibility = View.INVISIBLE
         txt_description.visibility = View.INVISIBLE
@@ -76,14 +91,13 @@ class WeatherFragment : MvpAppCompatFragment(), WeatherView,CoroutineScope {
         progress_circular.visibility = View.INVISIBLE
     }
 
-    override fun showWeather(weather: WeatherOneCall?) {
-        val currentWeather = weather?.current
-        val temp = currentWeather?.temp?.toInt().toString() + "°С"
-        txt_date.text = currentWeather?.dt?.let { DateParser.parse(it) }
-        txt_city.text = weather?.timezone
-        weather_icon.setImageResource(WeatherIconHelper.get(currentWeather?.weather?.get(0)!!.icon))
+    override fun showWeather(weather: WeatherOneCall) {
+        val temp = weather.current.temp.toString() + "°С"
+        txt_date.text = weather.current.dt.let { DateParser.parse(it) }
+        txt_city.text = weather.timezone
+        weather_icon.setImageResource(WeatherIconHelper.get(weather.current.weather[0].icon))
         txt_temp.text = temp
-        txt_description.text = currentWeather.weather[0].description
+        txt_description.text = weather.current.weather[0].description
 
     }
 
@@ -93,5 +107,7 @@ class WeatherFragment : MvpAppCompatFragment(), WeatherView,CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
+    }
 
-}
+
+

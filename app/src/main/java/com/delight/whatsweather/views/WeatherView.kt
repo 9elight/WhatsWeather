@@ -10,6 +10,6 @@ import moxy.viewstate.strategy.StateStrategyType
 interface WeatherView: MvpView{
     fun startWeatherLoading()
     fun endWeatherLoading()
-    fun showWeather(weather: WeatherOneCall?)
+    fun showWeather(weather: WeatherOneCall)
     fun showError(massage: String?)
 }
