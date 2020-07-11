@@ -1,70 +1,50 @@
 package com.delight.whatsweather.utils
 
-import android.Manifest
-import android.app.AlertDialog
-import android.app.Dialog
-import android.content.Intent
+import android.app.Activity
+import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Bundle
-import android.provider.Settings
-import androidx.appcompat.app.AppCompatActivity
+import android.location.LocationManager
+import android.util.Log
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.DialogFragment
+import com.delight.whatsweather.R
 
 
-class PermissionsUtils {
+class PermissionsUtils(private var pActivity: Activity) {
     companion object {
-        const val REQUEST_CODE = 400
-
-        fun newInstance(): LocationSettingDialog {
-            return LocationSettingDialog()
+        fun instance(pActivity: Activity): PermissionsUtils {
+            return PermissionsUtils(pActivity)
         }
     }
 
-    /**
-     * Runtime Permission Check
-     */
-    fun requestPermission(activity: AppCompatActivity?) {
-        ActivityCompat.requestPermissions(
-            activity!!, arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ),
-            REQUEST_CODE
+    fun checkPermissions(): Boolean{
+        val coarsePermissionState = ActivityCompat.checkSelfPermission(pActivity,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION)
+        val finePermissionState = ActivityCompat.checkSelfPermission(pActivity,
+            android.Manifest.permission.ACCESS_FINE_LOCATION)
+
+        return coarsePermissionState == PackageManager.PERMISSION_GRANTED &&
+                finePermissionState == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun startLocationPermissionRequest() {
+        ActivityCompat.requestPermissions(pActivity,
+            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+            MyLocationService.PERMISSIONS_REQUEST_CODE
         )
     }
 
-    /**
-     * Common methods to determine if a location permission is granted
-     */
-    fun isPermissionGranted(
-        grantPermissions: Array<String?>,
-        grantResults: IntArray
-    ): Boolean {
-        val permissionSize = grantPermissions.size
-        for (i in 0 until permissionSize) {
-            if (Manifest.permission.ACCESS_FINE_LOCATION == grantPermissions[i]) {
-                return grantResults[i] == PackageManager.PERMISSION_GRANTED
-            }
+    fun requestPermissions(){
+        val shouldProvideRationale = ActivityCompat.
+        shouldShowRequestPermissionRationale(pActivity,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION)
+
+        if (shouldProvideRationale){
+            Log.e("tag","requestPermission")
+        }else{
+            startLocationPermissionRequest()
         }
-        return false
     }
 
-    /**
-     * Dialog extension for permissions
-     */
-    class LocationSettingDialog : DialogFragment() {
-        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-            return AlertDialog.Builder(getActivity())
-                .setMessage("You need to set your device's location.")
-                .setPositiveButton("Confirm"
-                ) { dialogInterface, i ->
-                    val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(intent)
-                }.create()
-        }
-
-
-    }
 
 }
+

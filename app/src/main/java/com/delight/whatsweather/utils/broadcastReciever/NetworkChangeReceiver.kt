@@ -7,6 +7,7 @@ import android.net.ConnectivityManager
 
 class NetworkChangeReceiver : BroadcastReceiver() {
     companion object {
+
         var connectivityListener: ConnectivityListener? = null
 
         fun isConnected(context: Context?): Boolean {

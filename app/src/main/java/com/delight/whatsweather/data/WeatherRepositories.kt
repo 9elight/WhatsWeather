@@ -3,18 +3,18 @@ package com.delight.whatsweather.data
 import com.delight.whatsweather.data.local.WeatherRoomDb
 import com.delight.whatsweather.data.remote.WeatherService
 import com.delight.whatsweather.model.onecall.WeatherOneCall
-import com.delight.whatsweather.model.weatherModel.CurrentWeather
 
 
 class WeatherRepositories(private val weatherService: WeatherService, private val weatherDatabase: WeatherRoomDb) {
-    suspend fun getWeather(city:String,format: String) : CurrentWeather {
-        return weatherService.currentWeatherAsync(city, format)
-    }
-    suspend fun getOneCallWeather(lat: Double,lon:Double,lang: String,format: String): WeatherOneCall {
-        return weatherService.oneCallWeather(lat, lon, format, lang)
+
+    suspend fun getOneCallWeather(lat: Double,lon:Double,format: String): WeatherOneCall {
+        return weatherService.oneCallWeather(lat, lon, format)
     }
 
     suspend fun saveWeatherInDatabase(weather: WeatherOneCall){
+        if (weatherDatabase.weatherDao().getAllWeather().size > 10){
+            weatherDatabase.weatherDao().deleteAll()
+        }
         weatherDatabase.weatherDao().saveWeather(weather)
     }
 

@@ -3,9 +3,22 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/gray</item>
+        <item name="colorPrimaryDark">@color/dark_gray</item>
         <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="mainActivityTextStyle">
+        <item name="android:fontFamily">@font/space</item>
+        <item name="android:textColor">@color/gray</item>
+    </style>
+    <style name="recyclerTextStyle">
+        <item name="android:fontFamily">@font/space</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/txt_size_temp</item>
+    </style>
+    <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/black_overlay</item>
     </style>
 
 </resources>
